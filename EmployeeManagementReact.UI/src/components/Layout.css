@@ -1,0 +1,17 @@
+.layout {
+    display: flex;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    background-color: #f5f6fa;
+}
+
+.page-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+} 
