@@ -53,7 +53,7 @@ namespace EmployeeManagement.Data
 
             try
             {
-                var isExistsRolePage = await _context.RolePages.AnyAsync(rp => rp.RoleId == rolepage.RoleId && rp.PageId == rolepage.PageId);
+                var isExistsRolePage = await _context.RolePages.AnyAsync(rp => rp.RoleId == rolepage.RoleId && rp.PageId == rolepage.PageId && rp.Status == Status.Active);
 
                 if (!isExistsRolePage)
                 {

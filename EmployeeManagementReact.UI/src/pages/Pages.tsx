@@ -23,7 +23,13 @@ import {
     Box,
     Container,
     Stack,
-    Tooltip
+    Tooltip,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    OutlinedInput,
+    Chip
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -38,6 +44,7 @@ const getTokenFromCookie = (): string | null => {
 
 interface DecodedToken {
     UserId: string;
+    CompanyId: string;
     [key: string]: any;
 }
 
@@ -46,15 +53,28 @@ const getUserIdFromToken = (token: string): string => {
     return decoded.UserId;
 };
 
+const getCompanyIdFromToken = (token: string): string => {
+    const decoded = jwtDecode(token) as DecodedToken;
+    return decoded.CompanyId;
+};
+
+interface Role {
+    roleId: string;
+    roleName: string;
+}
+
 interface Page {
     pageId: string;
     pageName: string;
     pageDescription: string;
+    roles: Role[];
+    status: number;
 }
 
 interface PageDto {
     pageName: string;
     pageDescription: string;
+    roles: { roleId: string }[];
 }
 
 const Pages: React.FC = () => {
@@ -65,11 +85,37 @@ const Pages: React.FC = () => {
     const [editingPage, setEditingPage] = useState<Page | null>(null);
     const [pageName, setPageName] = useState('');
     const [pageDescription, setPageDescription] = useState('');
+    const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+    const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'success' as 'success' | 'error' | 'info'
     });
+
+    const fetchRoles = async () => {
+        try {
+            const token = getTokenFromCookie();
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+            
+            const companyId = getCompanyIdFromToken(token);
+            const response = await axios.get(`https://localhost:7076/api/v1/company/${companyId}/roles`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setAvailableRoles(response.data);
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+            setSnackbar({
+                open: true,
+                message: 'Error fetching roles',
+                severity: 'error'
+            });
+        }
+    };
 
     const fetchPages = async () => {
         try {
@@ -112,6 +158,7 @@ const Pages: React.FC = () => {
 
         fetchPageTitle();
         fetchPages();
+        fetchRoles();
     }, []);
 
     const handleAddPage = async () => {
@@ -124,7 +171,8 @@ const Pages: React.FC = () => {
             const userId = getUserIdFromToken(token);
             const pageDto: PageDto = {
                 pageName: pageName,
-                pageDescription: pageDescription
+                pageDescription: pageDescription,
+                roles: selectedRoleIds.map(id => ({ roleId: id }))
             };
 
             await axios.post(`https://localhost:7076/api/v1/pages/${userId}/add-page`,
@@ -145,6 +193,7 @@ const Pages: React.FC = () => {
             setOpenDialog(false);
             setPageName('');
             setPageDescription('');
+            setSelectedRoleIds([]);
             fetchPages();
         } catch (error) {
             console.error('Error adding page:', error);
@@ -160,6 +209,7 @@ const Pages: React.FC = () => {
         setEditingPage(page);
         setPageName(page.pageName);
         setPageDescription(page.pageDescription);
+        setSelectedRoleIds(page.roles.map(role => role.roleId));
         setOpenDialog(true);
     };
 
@@ -173,7 +223,8 @@ const Pages: React.FC = () => {
             const userId = getUserIdFromToken(token);
             const pageDto: PageDto = {
                 pageName: pageName,
-                pageDescription: pageDescription
+                pageDescription: pageDescription,
+                roles: selectedRoleIds.map(id => ({ roleId: id }))
             };
 
             await axios.put(`https://localhost:7076/api/v1/pages/${userId}/page/${editingPage.pageId}`,
@@ -194,6 +245,7 @@ const Pages: React.FC = () => {
             setOpenDialog(false);
             setPageName('');
             setPageDescription('');
+            setSelectedRoleIds([]);
             setEditingPage(null);
             fetchPages();
         } catch (error) {
@@ -241,10 +293,22 @@ const Pages: React.FC = () => {
         setEditingPage(null);
         setPageName('');
         setPageDescription('');
+        setSelectedRoleIds([]);
     };
 
     const handleCloseSnackbar = () => {
         setSnackbar({ ...snackbar, open: false });
+    };
+
+    const handleRoleChange = (event: any) => {
+        const value = event.target.value;
+        setSelectedRoleIds(typeof value === 'string' ? value.split(',') : value);
+    };
+
+    const handleRoleDelete = (roleIdToDelete: string) => (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setSelectedRoleIds(selectedRoleIds.filter(roleId => roleId !== roleIdToDelete));
     };
 
     return (
@@ -331,6 +395,13 @@ const Pages: React.FC = () => {
                                     }}>
                                         Description
                                     </TableCell>
+                                    <TableCell sx={{ 
+                                        fontWeight: 500,
+                                        backgroundColor: '#fff',
+                                        borderBottom: '1px solid #e0e0e0'
+                                    }}>
+                                        Roles
+                                    </TableCell>
                                     <TableCell align="right" sx={{ 
                                         fontWeight: 500,
                                         backgroundColor: '#fff',
@@ -355,6 +426,9 @@ const Pages: React.FC = () => {
                                         </TableCell>
                                         <TableCell>{page.pageName}</TableCell>
                                         <TableCell>{page.pageDescription}</TableCell>
+                                        <TableCell>
+                                            {page.roles?.map(role => role.roleName).join(', ')}
+                                        </TableCell>
                                         <TableCell align="right" sx={{ width: '120px' }}>
                                             <Tooltip title="Edit page">
                                                 <IconButton
@@ -413,7 +487,45 @@ const Pages: React.FC = () => {
                             value={pageDescription}
                             onChange={(e) => setPageDescription(e.target.value)}
                             variant="outlined"
+                            sx={{ mb: 2 }}
                         />
+                        <FormControl fullWidth variant="outlined">
+                            <InputLabel id="roles-label">Roles</InputLabel>
+                            <Select
+                                labelId="roles-label"
+                                multiple
+                                value={selectedRoleIds}
+                                onChange={handleRoleChange}
+                                input={<OutlinedInput label="Roles" />}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {selected.map((roleId) => {
+                                            const role = availableRoles.find(r => r.roleId === roleId);
+                                            return role ? (
+                                                <Chip 
+                                                    key={roleId} 
+                                                    label={role.roleName}
+                                                    onDelete={handleRoleDelete(roleId)}
+                                                    onMouseDown={(event) => {
+                                                        event.stopPropagation();
+                                                    }}
+                                                    sx={{ m: 0.5 }}
+                                                />
+                                            ) : null;
+                                        })}
+                                    </Box>
+                                )}
+                            >
+                                {availableRoles
+                                    .filter(role => !selectedRoleIds.includes(role.roleId))
+                                    .map((role) => (
+                                        <MenuItem key={role.roleId} value={role.roleId}>
+                                            {role.roleName}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </FormControl>
                     </DialogContent>
                     <DialogActions sx={{ p: 2, pt: 1 }}>
                         <Button onClick={handleCloseDialog} color="inherit">
