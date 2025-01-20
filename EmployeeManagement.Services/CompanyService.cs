@@ -37,67 +37,6 @@ namespace EmployeeManagement.Services
            await _companyRepository.Insert(newCompany);
         }
 
-        public async Task AddAdmin(PersonnelUserDto personnelUserDto)
-        {
-            try
-            {
-                // Check if company exists
-                var companyExists = await _companyRepository.GetAll()
-                    .AnyAsync(c => c.CompanyId == personnelUserDto.User.CompanyId && c.CompanyStatus == Status.Active);
-
-                if (!companyExists)
-                {
-                    throw new ServiceHttpException(HttpStatusCode.NotFound, "Company not found or inactive");
-                }
-
-                // Check if username already exists
-                var existingUser = await _userRepository.GetAll()
-                    .FirstOrDefaultAsync(u => u.Username == personnelUserDto.User.Username);
-
-                if (existingUser != null)
-                {
-                    throw new ServiceHttpException(HttpStatusCode.BadRequest, "Username already exists");
-                }
-
-                var newPersonnel = new Personnel
-                {
-                    FistName = personnelUserDto.Personnel.FirstName,
-                    LastName = personnelUserDto.Personnel.LastName,
-                    Email = personnelUserDto.Personnel.Email,
-                    Status = Status.Active,
-                };
-
-                await _personnelRepository.Insert(newPersonnel);
-
-                var newUser = new User
-                {
-                    Username = personnelUserDto.User.Username,
-                    Password = personnelUserDto.User.Password,
-                    Status = Status.Active,
-                    PersonnelId = newPersonnel.PersonnelId,
-                    CompanyId = personnelUserDto.User.CompanyId,
-                };
-
-                await _userRepository.Insert(newUser);
-
-                var adminRole = await _roleRepository.GetAll().FirstOrDefaultAsync(r => r.RoleName == "Admin");
-
-                var newUserRole = new UserRole
-                {
-                    RoleId = adminRole.RoleId,
-                    UserId = newUser.Id,
-                    Status = Status.Active
-                };
-
-                await _userRoleRepository.Insert(newUserRole);
-            }
-            catch (Exception ex)
-            {
-                // Consider using a logging service instead of Console.WriteLine
-                throw new Exception($"Registration failed: {ex.Message}", ex);
-            }
-        }
-
         public async Task<List<CompanyDto>> GetActiveCompanies()
         {
             try

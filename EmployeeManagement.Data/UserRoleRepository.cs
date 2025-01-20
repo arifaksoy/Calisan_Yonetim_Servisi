@@ -1,4 +1,5 @@
 ﻿using Calisan_Yonetim_Core.Models;
+using EmployeeManagement.Common.Enums;
 using EmployeeManagement.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,6 +25,16 @@ namespace EmployeeManagement.Data
         {
             await _context.UserRole.AddAsync(userRole);
             await SaveChangesAsync();
+        }
+
+        public async Task SoftDelete(UserRole userRole)
+        {
+            if (userRole != null)
+            {
+                userRole.Status = Status.Inactive;
+                _context.UserRole.Update(userRole);
+                await SaveChangesAsync();
+            }
         }
     }
 }

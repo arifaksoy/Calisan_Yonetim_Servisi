@@ -6,5 +6,6 @@ namespace EmployeeManagement.Dto
     {
         public PersonnelDto Personnel { get; set; }
         public UserDto User { get; set; }
+        public RoleDto Role { get; set; }
     }
 }

@@ -70,12 +70,6 @@ namespace Calisan_Yonetim_Servisi.Controllers
             }
         }
 
-        [HttpPost("add-admin")]
-        public async Task<IActionResult> AddAdmin([FromBody] PersonnelUserDto personnelUser)
-        {
-            await _CompanyServices.AddAdmin(personnelUser);
-            return Ok("Admin User added successfully!");
-        }
 
         [HttpGet("get-companies")]
         public async Task<IActionResult> GetActiveCompanies()

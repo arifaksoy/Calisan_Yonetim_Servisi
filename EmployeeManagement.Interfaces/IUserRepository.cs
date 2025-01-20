@@ -11,6 +11,6 @@ namespace EmployeeManagement.Interfaces
     {
         IQueryable<User> GetAll();
         Task Insert(User user);
-
+        Task Update(User user);
     }
 }

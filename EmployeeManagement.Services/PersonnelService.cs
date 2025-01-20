@@ -1,9 +1,13 @@
+using Calisan_Yonetim_Core.Exceptions;
+using Calisan_Yonetim_Core.Models;
 using EmployeeManagement.Common.Constant;
+using EmployeeManagement.Common.Enums;
 using EmployeeManagement.Dto;
 using EmployeeManagement.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace EmployeeManagement.Services
@@ -14,12 +18,22 @@ namespace EmployeeManagement.Services
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly ITokenService _tokenService;
-        public PersonnelService(IPersonnelRepository personnelRepository, IUserRoleRepository userRoleRepository, IRoleRepository roleRepository, ITokenService tokenService)
+        private readonly ICompanyRepository _companyRepository;
+        private readonly IUserRepository _userRepository;
+        public PersonnelService(IPersonnelRepository personnelRepository, 
+            IUserRoleRepository userRoleRepository, 
+            IRoleRepository roleRepository, 
+            ITokenService tokenService,
+            ICompanyRepository companyRepository,
+            IUserRepository userRepository
+            )
         {
             _personnelRepository = personnelRepository;
             _userRoleRepository = userRoleRepository;
             _roleRepository = roleRepository;
             _tokenService = tokenService;
+            _companyRepository = companyRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<IEnumerable<PersonnelListDto>> GetAllPersonnelAsync(Guid companyId)
@@ -46,6 +60,143 @@ namespace EmployeeManagement.Services
                                                       CompanyName = x.p.User.Company.CompanyName,
                                                       RoleName = x.r.RoleName,
                                                   }).ToListAsync();
+        }
+
+        public async Task CreatePersonnelAsync(Guid companyId, PersonnelUserDto personnelUserDto)
+        {
+            // Check if company exists
+            var companyExists = await _companyRepository.GetAll()
+                .AnyAsync(c => c.CompanyId == personnelUserDto.User.CompanyId && c.CompanyStatus == Status.Active);
+
+            if (!companyExists)
+            {
+                throw new ServiceHttpException(HttpStatusCode.NotFound, "Company not found or inactive");
+            }
+
+            // Check if username already exists
+            var existingUser = await _userRepository.GetAll()
+                .FirstOrDefaultAsync(u => u.Username == personnelUserDto.User.Username);
+
+            if (existingUser != null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.BadRequest, "Username already exists");
+            }
+
+            // Check if role exists
+            var role = await _roleRepository.GetAll()
+                .FirstOrDefaultAsync(r=>r.RoleId == personnelUserDto.Role.RoleId);
+
+            if (role == null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.BadRequest, "Role doesn't exist");
+            }
+
+            var newPersonnel = new Personnel
+            {
+                FistName = personnelUserDto.Personnel.FirstName,
+                LastName = personnelUserDto.Personnel.LastName,
+                Email = personnelUserDto.Personnel.Email,
+                Status = Status.Active,
+            };
+
+            await _personnelRepository.Insert(newPersonnel);
+
+            var newUser = new User
+            {
+                Username = personnelUserDto.User.Username,
+                Password = personnelUserDto.User.Password,
+                Status = Status.Active,
+                PersonnelId = newPersonnel.PersonnelId,
+                CompanyId = personnelUserDto.User.CompanyId,
+            };
+
+            await _userRepository.Insert(newUser);
+
+
+
+            var newUserRole = new UserRole
+            {
+                RoleId = personnelUserDto.Role.RoleId,
+                UserId = newUser.Id,
+                Status = Status.Active
+            };
+
+            await _userRoleRepository.Insert(newUserRole);
+        }
+
+        public async Task UpdatePersonnelAsync(Guid companyId, Guid employeeId, PersonnelUserDto personnelUserDto)
+        {
+            // Check if company exists
+            var companyExists = await _companyRepository.GetAll()
+                .AnyAsync(c => c.CompanyId == personnelUserDto.User.CompanyId && c.CompanyStatus == Status.Active);
+
+            if (!companyExists)
+            {
+                throw new ServiceHttpException(HttpStatusCode.NotFound, "Company not found or inactive");
+            }
+
+            // Get existing personnel
+            var existingPersonnel = await _personnelRepository.GetAll()
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.PersonnelId == employeeId);
+
+            if (existingPersonnel == null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.NotFound, "Personnel not found");
+            }
+
+            // Check if username exists for other users
+            var existingUser = await _userRepository.GetAll()
+                .FirstOrDefaultAsync(u => u.Username == personnelUserDto.User.Username && u.Id != existingPersonnel.User.Id);
+
+            if (existingUser != null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.BadRequest, "Username already exists");
+            }
+
+            // Check if role exists
+            var role = await _roleRepository.GetAll()
+                .FirstOrDefaultAsync(r => r.RoleId == personnelUserDto.Role.RoleId);
+
+            if (role == null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.BadRequest, "Role doesn't exist");
+            }
+
+            // Update personnel information
+            existingPersonnel.FistName = personnelUserDto.Personnel.FirstName;
+            existingPersonnel.LastName = personnelUserDto.Personnel.LastName;
+            existingPersonnel.Email = personnelUserDto.Personnel.Email;
+
+            // Update user information
+            existingPersonnel.User.Username = personnelUserDto.User.Username;
+            if (!string.IsNullOrEmpty(personnelUserDto.User.Password))
+            {
+                existingPersonnel.User.Password = personnelUserDto.User.Password;
+            }
+            existingPersonnel.User.CompanyId = personnelUserDto.User.CompanyId;
+
+            // Update user role
+            var existingUserRole = await _userRoleRepository.GetAll()
+                .FirstOrDefaultAsync(ur => ur.UserId == existingPersonnel.User.Id && ur.Status == Status.Active);
+
+            if (existingUserRole != null)
+            {
+                if(existingUserRole.RoleId != personnelUserDto.Role.RoleId)
+                {
+                    await _userRoleRepository.SoftDelete(existingUserRole);
+                    var newUserRole = new UserRole
+                    {
+                        RoleId = personnelUserDto.Role.RoleId,
+                        UserId = existingUser.Id,
+                        Status = Status.Active
+                    };
+                    await _userRoleRepository.Insert(newUserRole);
+                }
+            }
+
+            await _personnelRepository.Update(existingPersonnel);
+            await _userRepository.Update(existingPersonnel.User);
         }
     }
 } 

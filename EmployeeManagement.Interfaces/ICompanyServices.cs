@@ -10,7 +10,6 @@ namespace EmployeeManagement.Interfaces
         Task AddNewCompany(CompanyDto company);
         Task UpdateCompany(Guid companyId, CompanyDto company);
         Task DeleteCompany(Guid companyId);
-        Task AddAdmin(PersonnelUserDto personnelUserDto);
         Task<List<CompanyDto>> GetActiveCompanies();
     }
 }

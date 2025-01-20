@@ -28,6 +28,13 @@ namespace EmployeeManagement.Data
             await _context.Personnel.AddAsync(personnel);
             await SaveChangesAsync();
         }
+
+        public async Task Update(Personnel personnel)
+        {
+            _context.Personnel.Update(personnel);
+            await SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<PersonnelListDto>> GetAllActivePersonnelAsync()
         {
             return null;

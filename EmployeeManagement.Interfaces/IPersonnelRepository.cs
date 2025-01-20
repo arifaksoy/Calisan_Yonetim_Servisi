@@ -9,7 +9,7 @@ namespace EmployeeManagement.Interfaces
     {
         IQueryable<Personnel> GetAll();
         Task Insert(Personnel personnel);
+        Task Update(Personnel personnel);
         Task<IEnumerable<PersonnelListDto>> GetAllActivePersonnelAsync();
-
     }
 }

@@ -11,5 +11,6 @@ namespace EmployeeManagement.Interfaces
     {
         IQueryable<UserRole> GetAll();
         Task Insert(UserRole userRole);
+        Task SoftDelete(UserRole userRole);
     }
 }

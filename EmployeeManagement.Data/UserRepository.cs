@@ -25,5 +25,11 @@ namespace EmployeeManagement.Data
             await _context.Users.AddAsync(user);
             await SaveChangesAsync();
         }
+
+        public async Task Update(User user)
+        {
+            _context.Users.Update(user);
+            await SaveChangesAsync();
+        }
     }
 }
