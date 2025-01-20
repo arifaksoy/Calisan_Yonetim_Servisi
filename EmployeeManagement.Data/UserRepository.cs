@@ -1,4 +1,5 @@
 ﻿using Calisan_Yonetim_Core.Models;
+using EmployeeManagement.Common.Enums;
 using EmployeeManagement.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,6 +31,16 @@ namespace EmployeeManagement.Data
         {
             _context.Users.Update(user);
             await SaveChangesAsync();
+        }
+
+        public async Task Delete(User user)
+        {
+            if (user != null)
+            {
+                user.Status = Status.Inactive;
+                _context.Users.Update(user);
+                await SaveChangesAsync();
+            }
         }
     }
 }

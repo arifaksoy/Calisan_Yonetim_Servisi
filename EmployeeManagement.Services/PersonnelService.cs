@@ -51,12 +51,16 @@ namespace EmployeeManagement.Services
                                                     ur => ur.ur.RoleId,  // UserRole tablosundaki RoleId ile
                                                     r => r.RoleId,  // Role tablosundaki RoleId ile
                                                     (ur, r) => new { ur.p, ur, r })  // UserRole ve Role tablosunu birleştir
-                                                  .Where(x => x.p.User.CompanyId == companyId || role == UserRoleConstant.SystemAdmin)
+                                                  .Where(x => (x.p.User.CompanyId == companyId || role == UserRoleConstant.SystemAdmin) && x.ur.ur.Status == Status.Active)
                                                   .Select(x => new PersonnelListDto
                                                   {
                                                       PersonnelId = x.p.PersonnelId,
                                                       FirstName = x.p.FistName,
-                                                      LastName = x.p.FistName,
+                                                      LastName = x.p.LastName,
+                                                      UserName = x.p.User.Username,
+                                                      Email = x.p.Email,
+                                                      UserCompanyId = x.p.User.CompanyId,
+                                                      RoleId = x.r.RoleId,
                                                       CompanyName = x.p.User.Company.CompanyName,
                                                       RoleName = x.r.RoleName,
                                                   }).ToListAsync();
@@ -184,11 +188,11 @@ namespace EmployeeManagement.Services
             {
                 if(existingUserRole.RoleId != personnelUserDto.Role.RoleId)
                 {
-                    await _userRoleRepository.SoftDelete(existingUserRole);
+                    await _userRoleRepository.Delete(existingUserRole);
                     var newUserRole = new UserRole
                     {
                         RoleId = personnelUserDto.Role.RoleId,
-                        UserId = existingUser.Id,
+                        UserId = existingPersonnel.User.Id,
                         Status = Status.Active
                     };
                     await _userRoleRepository.Insert(newUserRole);
@@ -197,6 +201,43 @@ namespace EmployeeManagement.Services
 
             await _personnelRepository.Update(existingPersonnel);
             await _userRepository.Update(existingPersonnel.User);
+        }
+
+        public async Task DeletePersonnelAsync(Guid companyId, Guid employeeId)
+        {
+            var currentUserRole = _tokenService.GetUserRoleFromToken();
+
+            // Get existing personnel with user information
+            var existingPersonnel = await _personnelRepository.GetAll()
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.PersonnelId == employeeId);
+
+            if (existingPersonnel == null)
+            {
+                throw new ServiceHttpException(HttpStatusCode.NotFound, "Personnel not found");
+            }
+
+            // Check if personnel belongs to the company
+            if (existingPersonnel.User.CompanyId != companyId && currentUserRole != UserRoleConstant.SystemAdmin)
+            {
+                throw new ServiceHttpException(HttpStatusCode.BadRequest, "Personnel does not belong to the specified company");
+            }
+
+            // Get active user role
+            var existingUserRole = await _userRoleRepository.GetAll()
+                .FirstOrDefaultAsync(ur => ur.UserId == existingPersonnel.User.Id && ur.Status == Status.Active);
+
+            // Soft delete user role if exists
+            if (existingUserRole != null)
+            {
+                await _userRoleRepository.Delete(existingUserRole);
+            }
+
+            // Soft delete user
+            await _userRepository.Delete(existingPersonnel.User);
+
+            // Soft delete personnel
+            await _personnelRepository.Delete(existingPersonnel);
         }
     }
 } 

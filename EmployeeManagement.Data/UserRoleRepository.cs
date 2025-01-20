@@ -27,7 +27,7 @@ namespace EmployeeManagement.Data
             await SaveChangesAsync();
         }
 
-        public async Task SoftDelete(UserRole userRole)
+        public async Task Delete(UserRole userRole)
         {
             if (userRole != null)
             {

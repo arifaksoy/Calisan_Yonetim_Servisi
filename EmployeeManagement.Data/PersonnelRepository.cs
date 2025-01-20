@@ -35,6 +35,16 @@ namespace EmployeeManagement.Data
             await SaveChangesAsync();
         }
 
+        public async Task Delete(Personnel personnel)
+        {
+            if (personnel != null)
+            {
+                personnel.Status = Status.Inactive;
+                _context.Personnel.Update(personnel);
+                await SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<PersonnelListDto>> GetAllActivePersonnelAsync()
         {
             return null;

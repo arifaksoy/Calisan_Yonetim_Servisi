@@ -42,5 +42,13 @@ namespace Calisan_Yonetim_Servisi.Controllers
             await _personnelService.UpdatePersonnelAsync(companyId, employeeId, personnelUserDto);
             return Ok();
         }
+
+        [HttpDelete("{employeeId}")]
+        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        public async Task<IActionResult> Delete(Guid companyId, Guid employeeId)
+        {
+            await _personnelService.DeletePersonnelAsync(companyId, employeeId);
+            return Ok();
+        }
     }
 } 

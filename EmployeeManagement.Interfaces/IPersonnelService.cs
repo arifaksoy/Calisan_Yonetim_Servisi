@@ -9,5 +9,6 @@ namespace EmployeeManagement.Interfaces
         Task<IEnumerable<PersonnelListDto>> GetAllPersonnelAsync(Guid companyId);
         Task CreatePersonnelAsync(Guid companyId, PersonnelUserDto personnelUserDto);
         Task UpdatePersonnelAsync(Guid companyId, Guid employeeId, PersonnelUserDto personnelUserDto);
+        Task DeletePersonnelAsync(Guid companyId, Guid employeeId);
     }
 } 
