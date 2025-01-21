@@ -32,6 +32,7 @@ namespace Calisan_Yonetim_Core.Models
         public DbSet<Company> Company { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<RolePage> RolePages { get; set; }
+        public DbSet<Project> Projects { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,12 +41,17 @@ namespace Calisan_Yonetim_Core.Models
                 .WithOne(p => p.User)
                 .HasForeignKey<User>(u => u.PersonnelId);
 
+            // Project ve Company ilişkisi
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Company)
+                .WithMany()
+                .HasForeignKey(p => p.CompanyId);
+
             // Yeni Foreign Key için tanımlama
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Company)
-                .WithMany(c => c.Users) // Eğer bir Company birden fazla User'a sahipse
-                .HasForeignKey(u => u.CompanyId); // Foreign Key alanı
-
+                .WithMany(c => c.Users)
+                .HasForeignKey(u => u.CompanyId);
 
             modelBuilder.Entity<Personnel>()
                .HasOne(p => p.User)

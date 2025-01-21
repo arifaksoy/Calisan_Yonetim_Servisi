@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Calisan_Yonetim_Core.Services;
 using Calisan_Yonetim_Core.Extensions;
+using EmployeeManagement.Services.Maps;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+builder.Services.AddAutoMapper(typeof(ProjectProfile));
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
@@ -46,6 +48,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IPageRepository, PageRepository>();
 builder.Services.AddScoped<IRolePageRepository, RolePageRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
 // Service kayıtlarını da Scoped yapın
 builder.Services.AddScoped<IAccountServices, AccountService>();
@@ -54,6 +57,7 @@ builder.Services.AddScoped<ICompanyServices, CompanyService>();
 builder.Services.AddScoped<IPageService, PageService>();
 builder.Services.AddScoped<IPersonnelService, PersonnelService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
