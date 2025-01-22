@@ -33,7 +33,7 @@ namespace EmployeeManagement.Services
         {
             var currentRole = _tokenService.GetUserRoleFromToken();
 
-            var projects =  await _projectRepository.GetAll().Include(c=>c.Company).Where(p => (p.CompanyId == companyId && p.Status == Status.Active) || currentRole == UserRoleConstant.SystemAdmin).ToListAsync();
+            var projects =  await _projectRepository.GetAll().Include(c=>c.Company).Where(p => (p.CompanyId == companyId || currentRole == UserRoleConstant.SystemAdmin) && p.Status == Status.Active).ToListAsync();
 
             return _mapper.Map<List<ProjectDto>>(projects);
         }

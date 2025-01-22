@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Company from './pages/Company';
 import Pages from './pages/Pages';
 import EmployeeManagement from './pages/EmployeeManagement';
+import Projects from './pages/Projects';
 
 const App: React.FC = () => {
     return (
@@ -23,6 +24,7 @@ const App: React.FC = () => {
                         <Route path="company" element={<Company />} />
                         <Route path="pages" element={<Pages />} />
                         <Route path="employee" element={<EmployeeManagement />} />
+                        <Route path="projects" element={<Projects />} />
                     </Route>
                 </Route>
             </Routes>
