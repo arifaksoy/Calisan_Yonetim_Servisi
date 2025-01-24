@@ -9,6 +9,7 @@ import Company from './pages/Company';
 import Pages from './pages/Pages';
 import EmployeeManagement from './pages/EmployeeManagement';
 import Projects from './pages/Projects';
+import TimeEntries from './pages/TimeEntries';
 
 const App: React.FC = () => {
     return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
                         <Route path="pages" element={<Pages />} />
                         <Route path="employee" element={<EmployeeManagement />} />
                         <Route path="projects" element={<Projects />} />
+                        <Route path="time-entries" element={<TimeEntries />} />
                     </Route>
                 </Route>
             </Routes>
