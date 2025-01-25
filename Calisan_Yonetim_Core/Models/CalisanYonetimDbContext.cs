@@ -33,6 +33,7 @@ namespace Calisan_Yonetim_Core.Models
         public DbSet<Page> Pages { get; set; }
         public DbSet<RolePage> RolePages { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<TimeEntries> TimeEntries { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +41,22 @@ namespace Calisan_Yonetim_Core.Models
                 .HasOne(u => u.Personnel)
                 .WithOne(p => p.User)
                 .HasForeignKey<User>(u => u.PersonnelId);
+
+            // TimeEntries relationships
+            modelBuilder.Entity<TimeEntries>()
+                .HasOne(te => te.Project)
+                .WithMany()
+                .HasForeignKey(te => te.ProjectId);
+
+            modelBuilder.Entity<TimeEntries>()
+                .HasOne(te => te.Personnel)
+                .WithMany()
+                .HasForeignKey(te => te.PersonnelId);
+
+            // TimeEntries unique index
+            modelBuilder.Entity<TimeEntries>()
+                .HasIndex(te => new { te.TimeEntriesDate, te.ProjectId, te.PersonnelId })
+                .IsUnique();
 
             // Project ve Company ilişkisi
             modelBuilder.Entity<Project>()

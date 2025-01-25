@@ -4,6 +4,7 @@ using Calisan_Yonetim_Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Calisan_Yonetim_Core.Migrations
 {
     [DbContext(typeof(CalisanYonetimDbContext))]
-    partial class CalisanYonetimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125184929_added_timeentries_table")]
+    partial class added_timeentries_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
