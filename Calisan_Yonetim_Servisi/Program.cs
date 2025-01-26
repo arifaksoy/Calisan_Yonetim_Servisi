@@ -49,6 +49,7 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IPageRepository, PageRepository>();
 builder.Services.AddScoped<IRolePageRepository, RolePageRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<ITimeEntriesRepository, TimeEntriesRepository>();
 
 // Service kayıtlarını da Scoped yapın
 builder.Services.AddScoped<IAccountServices, AccountService>();
@@ -58,6 +59,7 @@ builder.Services.AddScoped<IPageService, PageService>();
 builder.Services.AddScoped<IPersonnelService, PersonnelService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ITimeEntriesService, TimeEntriesService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

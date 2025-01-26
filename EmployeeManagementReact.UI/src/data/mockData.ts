@@ -34,26 +34,51 @@ export const mockEmployees: Employee[] = [
 ];
 
 export const mockProjects: Project[] = [
-    { id: '22CS001.01', name: 'Verforce - Development' },
-    { id: '22CS002.01', name: 'CRM Integration' },
-    { id: '22CS003.01', name: 'Mobile App Development' }
+    { 
+        projectId: '22CS001.01',
+        projectName: 'Verforce - Development',
+        projectDescription: 'Verforce Development Project',
+        companyId: '1',
+        companyName: 'Default Company',
+        status: 1
+    },
+    { 
+        projectId: '22CS002.01',
+        projectName: 'CRM Integration',
+        projectDescription: 'CRM Integration Project',
+        companyId: '1',
+        companyName: 'Default Company',
+        status: 1
+    },
+    { 
+        projectId: '22CS003.01',
+        projectName: 'Mobile App Development',
+        projectDescription: 'Mobile App Development Project',
+        companyId: '1',
+        companyName: 'Default Company',
+        status: 1
+    }
 ];
 
 export const mockTimeEntries: TimeEntry[] = [
     {
-        id: 1,
-        employeeId: 1,
+        timeEntriesId: "1",
+        timeEntriesDate: "2024-01-20T00:00:00",
         projectId: '22CS001.01',
-        date: '2024-01-20',
-        hours: 8.5,
-        comment: 'Frontend development'
+        projectName: 'Verforce - Development',
+        personnelId: "1",
+        personnelName: "Arif Aksoy",
+        amount: 8.5,
+        status: 1
     },
     {
-        id: 2,
-        employeeId: 1,
+        timeEntriesId: "2",
+        timeEntriesDate: "2024-01-20T00:00:00",
         projectId: '22CS002.01',
-        date: '2024-01-20',
-        hours: 4,
-        comment: 'API integration'
+        projectName: 'CRM Integration',
+        personnelId: "1",
+        personnelName: "Arif Aksoy",
+        amount: 4,
+        status: 1
     }
 ]; 

@@ -17,17 +17,23 @@ export interface Employee {
 }
 
 export interface Project {
-    id: string;
-    name: string;
+    projectId: string;
+    projectName: string;
+    projectDescription: string;
+    companyId: string;
+    companyName: string;
+    status: number;
 }
 
 export interface TimeEntry {
-    id: number;
-    employeeId: number;
+    timeEntriesId: string;
+    timeEntriesDate: string;
     projectId: string;
-    date: string;
-    hours: number;
-    comment?: string;
+    projectName: string;
+    personnelId: string;
+    personnelName: string;
+    amount: number | null;
+    status: number;
 }
 
 export interface WeeklyTimesheet {

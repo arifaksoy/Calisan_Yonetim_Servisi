@@ -104,6 +104,19 @@
 .time-entries-grid th {
     background: #fafafa;
     font-weight: 500;
+    padding: 8px 4px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.time-entries-grid th > div:first-child {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.time-entries-grid th > div:last-child {
+    font-size: 0.9em;
+    color: #666;
 }
 
 .time-cell {
