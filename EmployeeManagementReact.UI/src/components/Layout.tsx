@@ -12,7 +12,8 @@ const defaultIcons: { [key: string]: string } = {
     'Pages': 'menu_book',
     'Employee': 'people',
     'Project': 'assignment',
-    'Time Entries': 'schedule'
+    'Time Entries': 'schedule',
+    'Review Time Entries': 'assessment'
 };
 
 // URL mapping for pages
@@ -22,7 +23,8 @@ const urlMapping: { [key: string]: string } = {
     'Pages': '/pages',
     'Employee': '/employee',
     'Project': '/projects',
-    'Time Entries': '/time-entries'
+    'Time Entries': '/time-entries',
+    'Review Time Entries': '/review-time-entries'
 };
 
 // Dashboard menu item that will always be present

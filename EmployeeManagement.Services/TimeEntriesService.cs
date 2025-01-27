@@ -35,13 +35,12 @@ namespace EmployeeManagement.Services
             _personnelRepository = personnelRepository;
         }
 
-        public async Task<List<TimeEntriesDto>> GetTimeEntries(Guid personnelId, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<List<TimeEntriesDto>> GetTimeEntries(Guid personnelId, Guid projectId, DateTime? startDate = null, DateTime? endDate = null)
         {
             var query = _timeEntriesRepository.GetAll()
                 .Include(t => t.Project)
                 .Include(t => t.Personnel)
-                .Where(t => t.Status == Status.Active && 
-                          (t.PersonnelId == personnelId || personnelId == Guid.Empty));
+                .Where(t => t.Status == Status.Active);
 
             if (startDate.HasValue)
             {
@@ -51,6 +50,16 @@ namespace EmployeeManagement.Services
             if (endDate.HasValue)
             {
                 query = query.Where(t => t.TimeEntriesDate <= endDate.Value.Date);
+            }
+
+            if(personnelId != Guid.Empty)
+            {
+                query = query.Where(t=> t.PersonnelId == personnelId);
+            }
+
+            if (projectId != Guid.Empty)
+            {
+                query = query.Where(t => t.ProjectId == projectId);
             }
 
             var timeEntries = await query.ToListAsync();

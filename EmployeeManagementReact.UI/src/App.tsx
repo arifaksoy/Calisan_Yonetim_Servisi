@@ -10,6 +10,7 @@ import Pages from './pages/Pages';
 import EmployeeManagement from './pages/EmployeeManagement';
 import Projects from './pages/Projects';
 import TimeEntries from './pages/TimeEntries';
+import ReviewTimeEntries from './pages/ReviewTimeEntries';
 
 const App: React.FC = () => {
     return (
@@ -27,6 +28,7 @@ const App: React.FC = () => {
                         <Route path="employee" element={<EmployeeManagement />} />
                         <Route path="projects" element={<Projects />} />
                         <Route path="time-entries" element={<TimeEntries />} />
+                        <Route path="review-time-entries" element={<ReviewTimeEntries />} />
                     </Route>
                 </Route>
             </Routes>

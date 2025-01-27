@@ -27,6 +27,7 @@ import {
     Alert,
     IconButton,
     Tooltip,
+    TablePagination
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -113,6 +114,8 @@ const EmployeeManagement: React.FC = () => {
     });
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const fetchEmployees = async () => {
         try {
@@ -361,6 +364,18 @@ const EmployeeManagement: React.FC = () => {
         setEmployeeToDelete(null);
     };
 
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    // Calculate the current page's data
+    const currentPageData = employees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
     useEffect(() => {
         const fetchPageTitle = async () => {
             try {
@@ -497,18 +512,18 @@ const EmployeeManagement: React.FC = () => {
                                     }}>
                                         Role Name
                                     </TableCell>
-                                    <TableCell sx={{ 
+                                    <TableCell align="right" sx={{ 
                                         fontWeight: 500,
                                         backgroundColor: '#fff',
                                         borderBottom: '1px solid #e0e0e0',
-                                        width: '80px'
+                                        width: '120px'
                                     }}>
                                         Actions
                                     </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {employees.map((employee) => (
+                                {currentPageData.map((employee) => (
                                     <TableRow 
                                         key={employee.personnelId} 
                                         hover
@@ -525,7 +540,7 @@ const EmployeeManagement: React.FC = () => {
                                         <TableCell>{employee.companyName}</TableCell>
                                         <TableCell>{employee.userName}</TableCell>
                                         <TableCell>{employee.roleName}</TableCell>
-                                        <TableCell>
+                                        <TableCell align="right" sx={{ width: '120px' }}>
                                             <Tooltip title="Edit employee">
                                                 <IconButton
                                                     color="info"
@@ -550,6 +565,15 @@ const EmployeeManagement: React.FC = () => {
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 50]}
+                            component="div"
+                            count={employees.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </Paper>
                 )}
 

@@ -29,7 +29,8 @@ import {
     Select,
     MenuItem,
     OutlinedInput,
-    Chip
+    Chip,
+    TablePagination
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -87,6 +88,8 @@ const Pages: React.FC = () => {
     const [pageDescription, setPageDescription] = useState('');
     const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
     const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -311,6 +314,18 @@ const Pages: React.FC = () => {
         setSelectedRoleIds(selectedRoleIds.filter(roleId => roleId !== roleIdToDelete));
     };
 
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    // Calculate the current page's data
+    const currentPageData = pages.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
     return (
         <Stack spacing={3}>
             <Box sx={{ 
@@ -413,7 +428,7 @@ const Pages: React.FC = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {pages.map((page) => (
+                                {currentPageData.map((page) => (
                                     <TableRow 
                                         key={page.pageId} 
                                         hover
@@ -454,6 +469,15 @@ const Pages: React.FC = () => {
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 50]}
+                            component="div"
+                            count={pages.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </Paper>
                 )}
 

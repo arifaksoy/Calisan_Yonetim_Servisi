@@ -26,7 +26,8 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    TablePagination
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -80,6 +81,8 @@ const Projects: React.FC = () => {
     });
     const [companies, setCompanies] = useState<Company[]>([]);
     const [selectedCompanyId, setSelectedCompanyId] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const fetchProjects = async () => {
         try {
@@ -311,13 +314,50 @@ const Projects: React.FC = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    // Calculate the current page's data
+    const currentPageData = projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
     return (
-        <Box sx={{ height: '100%', p: 3 }}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                <Typography variant="h4" gutterBottom>
+        <Stack spacing={3}>
+            <Box sx={{ 
+                borderBottom: '1px solid #e0e0e0',
+                pb: 2,
+                display: 'flex',
+                alignItems: 'center'
+            }}>
+                <Typography 
+                    variant="h4" 
+                    component="h1" 
+                    sx={{ 
+                        color: '#666',
+                        fontWeight: 500,
+                        fontSize: '1.75rem'
+                    }}
+                >
                     {pageTitle}
                 </Typography>
-            </Stack>
+                <Typography 
+                    variant="h4" 
+                    component="span" 
+                    sx={{ 
+                        color: '#666',
+                        fontWeight: 400,
+                        fontSize: '1.75rem',
+                        ml: 1
+                    }}
+                >
+                    Management
+                </Typography>
+            </Box>
 
             <Container maxWidth={false} sx={{ p: 0 }}>
                 <Box sx={{ mb: 2 }}>
@@ -388,7 +428,7 @@ const Projects: React.FC = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {projects.map((project) => (
+                                {currentPageData.map((project) => (
                                     <TableRow 
                                         key={project.projectId} 
                                         hover
@@ -427,6 +467,15 @@ const Projects: React.FC = () => {
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 50]}
+                            component="div"
+                            count={projects.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </Paper>
                 )}
 
@@ -508,7 +557,7 @@ const Projects: React.FC = () => {
                     </Alert>
                 </Snackbar>
             </Container>
-        </Box>
+        </Stack>
     );
 };
 

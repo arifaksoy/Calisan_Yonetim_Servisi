@@ -22,10 +22,12 @@ import {
     Box,
     Container,
     Stack,
-    Tooltip
+    Tooltip,
+    TablePagination
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const getTokenFromCookie = (): string | null => {
     const token = document.cookie
@@ -51,6 +53,8 @@ const Company: React.FC = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [editingCompany, setEditingCompany] = useState<Company | null>(null);
     const [companyName, setCompanyName] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -223,6 +227,18 @@ const Company: React.FC = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    // Calculate the current page's data
+    const currentPageData = companies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
     return (
         <Stack spacing={3}>
             <Box sx={{ 
@@ -311,7 +327,7 @@ const Company: React.FC = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {companies.map((company) => (
+                                {currentPageData.map((company) => (
                                     <TableRow 
                                         key={company.companyId} 
                                         hover
@@ -348,6 +364,15 @@ const Company: React.FC = () => {
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 50]}
+                            component="div"
+                            count={companies.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </Paper>
                 )}
 
