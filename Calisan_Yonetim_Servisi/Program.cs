@@ -81,7 +81,15 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyConstant.SystemAdminOnly, policy =>
         policy.RequireClaim(TokenClaimConstants.Role, UserRoleConstant.SystemAdmin));
-    options.AddPolicy(PolicyConstant.User, policy =>
+
+    options.AddPolicy(PolicyConstant.Admin, policy =>
+        policy.RequireClaim(TokenClaimConstants.Role, UserRoleConstant.Admin));
+
+    // Hem Admin hem de SystemAdmin için ortak policy
+    options.AddPolicy(PolicyConstant.AdminOrSystemAdmin, policy =>
+        policy.RequireClaim(TokenClaimConstants.Role, UserRoleConstant.SystemAdmin, UserRoleConstant.Admin));
+
+options.AddPolicy(PolicyConstant.User, policy =>
         policy.RequireAssertion(context => {
             var userIdClaim = context.User.FindFirst(TokenClaimConstants.UserId)?.Value;
             var httpContext = context.Resource as DefaultHttpContext;

@@ -7,6 +7,8 @@
     position: fixed;
     left: 0;
     top: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar-header {
@@ -44,6 +46,7 @@
 .sidebar-nav {
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
 .nav-item {
@@ -66,4 +69,20 @@
 
 .material-icons {
     font-size: 20px;
+}
+
+.logout-button {
+    margin-top: auto;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    text-align: left;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
 } 

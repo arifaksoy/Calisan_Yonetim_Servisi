@@ -1,4 +1,5 @@
-﻿using EmployeeManagement.Dto;
+﻿using EmployeeManagement.Common.Constant;
+using EmployeeManagement.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace EmployeeManagement.Interfaces
     {
         string GenerateToken(TokenClaimDto tokenClaim);
         string GetUserRoleFromToken();
+        public string GetUserCompanyIdFromToken();
+        public string GetUserUserIdFromToken();
     }
 }

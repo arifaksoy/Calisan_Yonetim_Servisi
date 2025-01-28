@@ -39,6 +39,7 @@ namespace EmployeeManagement.Services
         public async Task<IEnumerable<PersonnelListDto>> GetAllPersonnelAsync(Guid companyId)
         {
             var role = _tokenService.GetUserRoleFromToken();
+            var currentUserId = _tokenService.GetUserUserIdFromToken();
 
             return await _personnelRepository.GetAll()
                                              .Include(p => p.User)
@@ -51,7 +52,8 @@ namespace EmployeeManagement.Services
                                                     ur => ur.ur.RoleId,  // UserRole tablosundaki RoleId ile
                                                     r => r.RoleId,  // Role tablosundaki RoleId ile
                                                     (ur, r) => new { ur.p, ur, r })  // UserRole ve Role tablosunu birleştir
-                                                  .Where(x => (x.p.User.CompanyId == companyId || role == UserRoleConstant.SystemAdmin) && x.ur.ur.Status == Status.Active)
+                                                  .Where(x => (x.p.User.CompanyId == companyId || role == UserRoleConstant.SystemAdmin) && x.ur.ur.Status == Status.Active
+                                                                   && (x.p.User.Id == Guid.Parse(currentUserId) || role != UserRoleConstant.User))
                                                   .Select(x => new PersonnelListDto
                                                   {
                                                       PersonnelId = x.p.PersonnelId,

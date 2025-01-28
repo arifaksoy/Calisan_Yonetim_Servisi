@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace Calisan_Yonetim_Servisi.Controllers
 {
-    [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+    [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
     [Route("api/v1/Company")]
     [ApiController]
     public class CompanyController : Controller

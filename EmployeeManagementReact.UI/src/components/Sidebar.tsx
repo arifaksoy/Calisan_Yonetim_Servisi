@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuItem } from '../types/types';
-import { getTokenClaims } from '../services/authService';
+import { getTokenClaims, removeAuthToken } from '../services/authService';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -10,6 +10,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [userData, setUserData] = useState({ username: '', companyName: '' });
 
     useEffect(() => {
@@ -21,6 +22,11 @@ const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
             });
         }
     }, []);
+
+    const handleLogout = () => {
+        removeAuthToken();
+        navigate('/login');
+    };
 
     return (
         <div className="sidebar">
@@ -46,6 +52,10 @@ const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
                         <span>{item.title}</span>
                     </Link>
                 ))}
+                <button onClick={handleLogout} className="nav-item logout-button">
+                    <span className="material-icons">logout</span>
+                    <span>Logout</span>
+                </button>
             </nav>
         </div>
     );

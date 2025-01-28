@@ -24,13 +24,13 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTimeEntriesByCompany(
+        public async Task<IActionResult> GetTimeEntriesByCompany(Guid companyId,
             [FromQuery] Guid personnelId,
             [FromQuery] Guid projectId,
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var result = await _timeEntriesService.GetTimeEntries(personnelId, projectId,startDate, endDate);
+            var result = await _timeEntriesService.GetTimeEntries(companyId, personnelId, projectId,startDate, endDate);
             return Ok(result);
         }
 

@@ -9,6 +9,8 @@ namespace EmployeeManagement.Common.Constant
     public class PolicyConstant
     {
         public const string SystemAdminOnly = "SystemAdminOnly";
+        public const string Admin = "Admin";
         public const string User = "User";
+        public const string AdminOrSystemAdmin = "AdminOrSystemAdmin";
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Calisan_Yonetim_Servisi.Controllers
 {
-    //[Authorize(Policy = PolicyConstant.compa)]
     [Route("api/v1/company/{companyId}/roles")]
     [ApiController]
     public class RoleController : ControllerBase
@@ -19,7 +18,7 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         public async Task<ActionResult<IEnumerable<RoleDto>>> GetRolesByCompanyId(Guid companyId)
         {
             try

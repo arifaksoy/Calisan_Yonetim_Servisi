@@ -1,6 +1,7 @@
 using Calisan_Yonetim_Core;
 using Calisan_Yonetim_Core.Exceptions;
 using Calisan_Yonetim_Core.Models;
+using EmployeeManagement.Common.Constant;
 using EmployeeManagement.Common.Enums;
 using EmployeeManagement.Dto;
 using EmployeeManagement.Interfaces;
@@ -17,6 +18,7 @@ namespace EmployeeManagement.Services
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IPersonnelRepository _personnelRepository;
+        private readonly ITokenService _tokenService;
         public CompanyService(ICompanyRepository companyRepository, IPersonnelRepository personnelRepository, ITokenService tokenService, IUserRepository userRepository, IUserRoleRepository userRoleRepository, IRoleRepository roleRepository)
         {
             _companyRepository = companyRepository;
@@ -24,6 +26,7 @@ namespace EmployeeManagement.Services
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
             _roleRepository = roleRepository;
+            _tokenService = tokenService;
         }
          
         public async Task  AddNewCompany(CompanyDto company)
@@ -41,8 +44,12 @@ namespace EmployeeManagement.Services
         {
             try
             {
+                var userCompanyId =  _tokenService.GetUserCompanyIdFromToken();
+                var userRole =  _tokenService.GetUserRoleFromToken();
+                
+
                 var activeCompanies = await _companyRepository.GetAll()
-                    .Where(c => c.CompanyStatus == Status.Active)
+                    .Where(c => c.CompanyStatus == Status.Active && (c.CompanyId == Guid.Parse(userCompanyId) || UserRoleConstant.SystemAdmin == userRole ))
                     .Select(c => new CompanyDto
                     {
                         CompanyId = c.CompanyId,

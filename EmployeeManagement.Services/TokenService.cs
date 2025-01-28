@@ -55,4 +55,16 @@ public class TokenService:ITokenService
         var role = _httpContextAccessor.HttpContext?.User?.FindFirst(TokenClaimConstants.Role)?.Value;
         return role ?? string.Empty;
     }
+
+    public string GetUserCompanyIdFromToken()
+    {
+        var companyId = _httpContextAccessor.HttpContext?.User?.FindFirst(TokenClaimConstants.CompanyId)?.Value;
+        return companyId ?? string.Empty;
+    }
+
+    public string GetUserUserIdFromToken()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(TokenClaimConstants.UserId)?.Value;
+        return userId ?? string.Empty;
+    }
 }

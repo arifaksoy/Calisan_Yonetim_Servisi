@@ -20,7 +20,7 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<PersonnelListDto>>> GetAll(Guid companyId)
         {
             var result = await _personnelService.GetAllPersonnelAsync(companyId);
@@ -28,7 +28,7 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         public async Task<IActionResult> Create(Guid companyId, [FromBody] PersonnelUserDto personnelUserDto)
         {
             await _personnelService.CreatePersonnelAsync(companyId, personnelUserDto);
@@ -36,7 +36,7 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpPut("{employeeId}")]
-        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         public async Task<IActionResult> Update(Guid companyId, Guid employeeId, [FromBody] PersonnelUserDto personnelUserDto)
         {
             await _personnelService.UpdatePersonnelAsync(companyId, employeeId, personnelUserDto);
@@ -44,7 +44,7 @@ namespace Calisan_Yonetim_Servisi.Controllers
         }
 
         [HttpDelete("{employeeId}")]
-        [Authorize(Policy = PolicyConstant.SystemAdminOnly)]
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         public async Task<IActionResult> Delete(Guid companyId, Guid employeeId)
         {
             await _personnelService.DeletePersonnelAsync(companyId, employeeId);

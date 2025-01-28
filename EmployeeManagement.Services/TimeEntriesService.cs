@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Calisan_Yonetim_Core.Exceptions;
+using EmployeeManagement.Common.Constant;
 
 namespace EmployeeManagement.Services
 {
@@ -35,12 +36,15 @@ namespace EmployeeManagement.Services
             _personnelRepository = personnelRepository;
         }
 
-        public async Task<List<TimeEntriesDto>> GetTimeEntries(Guid personnelId, Guid projectId, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<List<TimeEntriesDto>> GetTimeEntries(Guid companyId, Guid personnelId, Guid projectId, DateTime? startDate = null, DateTime? endDate = null)
         {
+            var userRole = _tokenService.GetUserRoleFromToken();
+
             var query = _timeEntriesRepository.GetAll()
                 .Include(t => t.Project)
                 .Include(t => t.Personnel)
-                .Where(t => t.Status == Status.Active);
+                .Include(t => t.Personnel.User)
+                .Where(t => t.Status == Status.Active && (t.Personnel.User.CompanyId == companyId || UserRoleConstant.SystemAdmin == userRole));
 
             if (startDate.HasValue)
             {

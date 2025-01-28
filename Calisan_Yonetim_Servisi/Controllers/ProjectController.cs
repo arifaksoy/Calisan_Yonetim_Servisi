@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Calisan_Yonetim_Servisi.Controllers
 {
-    [Authorize(Policy =PolicyConstant.SystemAdminOnly)]
-    //[Authorize(Policy =PolicyConstant.ad)]
+
+    [Authorize]
     [Route("api/v1/company/{companyId}/projects")]
     [ApiController]
     public class ProjectController : ControllerBase
@@ -28,21 +28,21 @@ namespace Calisan_Yonetim_Servisi.Controllers
             var result = await _projectService.GetProjects(companyId);
             return Ok(result);
         }
-
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProjectDto project)
         {
             await _projectService.AddAsync(project);
             return Ok();
         }
-
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ProjectDto project)
         {
              await _projectService.UpdateAsync(id,project);
             return Ok();
         }
-
+        [Authorize(Policy = PolicyConstant.AdminOrSystemAdmin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
